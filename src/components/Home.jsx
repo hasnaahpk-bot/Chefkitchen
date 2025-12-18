@@ -206,6 +206,27 @@ const Home = () => {
     ${isActive ? "after:w-20" : "after:w-0 hover:after:w-10"}
   `;
 
+  const handleIncrease = (item) => {
+  setCart((prev) =>
+    prev.map((p) =>
+      p.id === item.id && p.size === item.size
+        ? { ...p, quantity: p.quantity + 1 }
+        : p
+    )
+  );
+};
+
+const handleDecrease = (item) => {
+  setCart((prev) =>
+    prev.map((p) =>
+      p.id === item.id && p.size === item.size
+        ? { ...p, quantity: Math.max(1, p.quantity - 1) }
+        : p
+    )
+  );
+};
+
+
   return (
     <>
       {showToast && (
@@ -377,6 +398,8 @@ const Home = () => {
                 items={cart}
                 onRemove={handleRemove}
                 onNoteChange={handleNoteChange}
+                onIncrease={handleIncrease}
+                onDecrease={handleDecrease}
                 onClose={() => setIsCartOpen(false)}
                 onOrder={() => {
                   setShowReceipt(true);
@@ -393,6 +416,7 @@ const Home = () => {
           items={cart}
           orderType={orderType}
           onClose={() => setShowReceipt(false)}
+
         />
       )}
     </>

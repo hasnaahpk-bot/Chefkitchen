@@ -7,12 +7,17 @@ const OrdersPanel = ({
   onOrder,
   onClose,
   onNoteChange,
+  onIncrease,
+  onDecrease,
   className = "",
 }) => {
   const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+
+
 
   return (
     <aside
@@ -55,6 +60,8 @@ const OrdersPanel = ({
               item={item}
               onRemove={onRemove}
               onNoteChange={onNoteChange}
+              onIncrease={onIncrease}
+              onDecrease={onDecrease}
             />
           ))
         )}

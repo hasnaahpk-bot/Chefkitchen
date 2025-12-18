@@ -1,6 +1,6 @@
 import Trash from "../assets/trash.svg";
 
-const OrderItem = ({ item, onRemove, onNoteChange }) => {
+const OrderItem = ({ item, onRemove, onNoteChange, onIncrease, onDecrease, }) => {
   return (
     <div className="grid grid-cols-[1fr_48px_64px] gap-3 w-full min-w-0 sm:grid-cols-[1fr_56px_72px]">
       {/* ITEM */}
@@ -40,10 +40,26 @@ const OrderItem = ({ item, onRemove, onNoteChange }) => {
       </div>
 
       {/* QTY */}
-      <div className="flex justify-center items-start pt-1 pl-5">
-        <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#2a2a3a] rounded-md flex items-center justify-center text-sm text-white">
+      
+      <div className="flex flex-row items-center gap-1 pt-1 ">
+       
+         <button
+          onClick={() => onDecrease(item)}
+          className="w-8 h-7 sm:w-8 sm:h-7 bg-[#2a2a3a] text-white rounded-md text-sm"
+        >
+          −
+        </button>
+
+        <div className="w-8 h-7 sm:w-8 sm:h-7 bg-[#2a2a3a] rounded-md flex items-center justify-center text-sm text-white">
           {item.quantity}
         </div>
+
+         <button
+          onClick={() => onIncrease(item)}
+          className="w-8 h-7 sm:w-8 sm:h-7 bg-[#2a2a3a] text-white rounded-md text-sm"
+        >
+          +
+        </button>
       </div>
 
       {/* PRICE + DELETE */}
