@@ -1,7 +1,7 @@
 import { useState } from "react";
 import logoo from "../assets/logoo.svg";
 
-import Home_icon from "../assets/Home_icon.svg";
+import Home_icon from "../assets/home_icon.svg";
 import Offer_icon from "../assets/offer.svg";
 import Like_icon from "../assets/like.svg";
 import Male_icon from "../assets/male.svg";
