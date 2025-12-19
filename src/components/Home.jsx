@@ -319,7 +319,7 @@ const handleDecrease = (item) => {
     overflow-x-auto no-scrollbar
     sm:flex-wrap sm:overflow-visible
     border-b border-[#393C49]
-    py-2 px-2 whitespace-nowrap
+     px-2 whitespace-nowrap
   "
                   >
                     {[
@@ -342,7 +342,7 @@ const handleDecrease = (item) => {
         after:content-['']
         after:absolute
         after:left-0
-        after:-bottom-[1px]
+        after:-bottom-[2px]
         after:h-[3px]
         after:w-full
         after:rounded-full
