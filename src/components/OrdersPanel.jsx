@@ -1,5 +1,6 @@
 import { BiX } from "react-icons/bi";
 import OrderItem from "./OrderItem";
+import { button } from "framer-motion/client";
 
 const OrdersPanel = ({
   items,
@@ -41,6 +42,22 @@ const OrdersPanel = ({
       <h3 className="text-lg font-semibold text-white mb-3">
         Orders
       </h3>
+
+      {/* ordertype */}
+    <div className="flex gap-3 mb-4">
+      {["Dine In", "Take away", "Delivery"].map((type) => (
+        <button
+        key={type}
+        className="text-xs px-3 py-1 rounded-md
+        border border-orange-500
+        text-orange-400
+        hover:bg-[#EA7C69] hover:text-white
+        transition">
+          {type}
+        </button>
+      ))}
+    </div>
+
 
       {/* HEADER */}
       <div className="grid grid-cols-[1fr_50px_70px] text-xs text-gray-400 border-b border-white/10 pb-2 mb-3">
