@@ -392,7 +392,9 @@ const handleDecrease = (item) => {
                 )}
               </section>
             </main>
+            
 
+            <div className="hidden lg:block">
             {isCartOpen && (
               <OrdersPanel
                 items={cart}
@@ -407,6 +409,7 @@ const handleDecrease = (item) => {
                 }}
               />
             )}
+            </div>
           </div>
         </div>
       </div>
@@ -419,6 +422,42 @@ const handleDecrease = (item) => {
 
         />
       )}
+
+     {/* MOBILE CART */}
+<div
+  className={`
+    fixed inset-0 z-[999] lg:hidden
+    bg-black/50
+    transition-opacity duration-300
+    ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
+  `}
+  onClick={() => setIsCartOpen(false)}
+>
+  <div
+    className={`
+      absolute top-0 right-0 h-full
+      w-[85%] max-w-[380px]
+      transition-transform duration-300 ease-out
+      ${isCartOpen ? "translate-x-0" : "translate-x-full"}
+    `}
+    onClick={(e) => e.stopPropagation()}
+  >
+    <OrdersPanel
+      items={cart}
+      onRemove={handleRemove}
+      onNoteChange={handleNoteChange}
+      onIncrease={handleIncrease}
+      onDecrease={handleDecrease}
+      onClose={() => setIsCartOpen(false)}
+      onOrder={() => {
+        setShowReceipt(true);
+        setIsCartOpen(false);
+      }}
+    />
+  </div>
+</div>
+
+
     </>
   );
 };

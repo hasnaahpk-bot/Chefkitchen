@@ -1,6 +1,7 @@
 import { BiX } from "react-icons/bi";
 import OrderItem from "./OrderItem";
 import { button } from "framer-motion/client";
+import { useState } from "react";
 
 const OrdersPanel = ({
   items,
@@ -18,6 +19,7 @@ const OrdersPanel = ({
   );
 
 
+  const [activeType, setActiveType] = useState("Dine In");
 
 
   return (
@@ -43,16 +45,21 @@ const OrdersPanel = ({
         Orders
       </h3>
 
-      {/* ordertype */}
-    <div className="flex gap-3 mb-4">
+      
+     <div className="flex gap-3 mb-4">
       {["Dine In", "Take away", "Delivery"].map((type) => (
         <button
-        key={type}
-        className="text-xs px-3 py-1 rounded-md
-        border border-orange-500
-        text-orange-400
-        hover:bg-[#EA7C69] hover:text-white
-        transition">
+          key={type}
+          onClick={() => setActiveType(type)}
+          className={`
+            text-xs px-3 py-2 rounded-md border transition
+            ${
+              activeType === type
+                ? "bg-[#EA7C69] text-white border-[#EA7C69]"
+                : "border-orange-500 text-orange-400 hover:bg-[#EA7C69] hover:text-white"
+            }
+          `}
+        >
           {type}
         </button>
       ))}
@@ -60,7 +67,7 @@ const OrdersPanel = ({
 
 
       {/* HEADER */}
-      <div className="grid grid-cols-[1fr_50px_70px] text-xs text-gray-400 border-b border-white/10 pb-2 mb-3">
+      <div className="grid grid-cols-[1fr_50px_70px] text-xs text-gray-400 border-b border-white/10 pb-2 py-2 mb-3">
         <span>Item</span>
         <span className="text-center">Qty</span>
         <span className="text-right">Price</span>
