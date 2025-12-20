@@ -1,5 +1,5 @@
-import Landingpg from "./components/Landingpg";
-import Home from "./components/Home";
+import Landingpg from "./pages/Landingpg";
+import Home from "./pages/Home";
 import { Route, Routes } from "react-router-dom";
 import Offer from "./components/Offer";
 import Wishlist from "./components/Wishlist";
@@ -13,8 +13,8 @@ import Notify from "./components/Notify";
 // TODO : Make the Empty dish text ["No dishes match your selection"] to the ceneter of the screen {{done}}
 // TODO : Use context here for the state management {{done}}
 
-// TODO : Create a seperate folder for pages and move the pages from the components
-// TODO : Make this entire application responsive [ The list layout won't break in each screen ] min w kodka .font barlow {{done}}
+// TODO : Create a seperate folder for pages and move the pages from the components {{done}}
+// TODO : Make this entire application responsive [ The list layout won't break in each screen ]  {{done}}
 
 
 const App = () => {

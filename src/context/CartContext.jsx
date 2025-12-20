@@ -5,21 +5,42 @@ const CartContext = createContext(null);
 export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
 
-  const addToCart = (dish) => {
-    setCart((prev) => {
-const existing = prev.find(
-  (i) => i.id === dish.id && i.size === dish.size
-);
-      if (existing) {
-        return prev.map((i) =>
-i.id === dish.id && i.size === dish.size
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
-      }
-      return [...prev, { ...dish, quantity: 1 }];
-    });
-  };
+const addToCart = (dish) => {
+  setCart((prev) => {
+    const existing = prev.find(
+      (i) => i.id === dish.id && i.size === dish.size
+    );
+
+    if (existing) {
+      return prev.map((i) =>
+        i.id === dish.id && i.size === dish.size
+          ? { ...i, quantity: i.quantity + 1 }
+          : i
+      );
+    }
+
+    const price = Number(dish.prices?.[dish.size]);
+
+    if (Number.isNaN(price)) {
+      console.error("Invalid price for dish:", dish);
+      return prev; // hard stop — prevents corrupt cart
+    }
+
+    return [
+      ...prev,
+      {
+        id: dish.id,
+        title: dish.title,
+        img: dish.img,
+        size: dish.size,
+        quantity: 1,
+        price, // ✅ CRITICAL LINE
+        note: "",
+      },
+    ];
+  });
+};
+
 
   const removeFromCart = (id, size) => {
   setCart((prev) =>
@@ -37,19 +58,6 @@ i.id === dish.id && i.size === dish.size
     )
   );
 };
-
-
-//   const decreaseQty = (id, size) => {
-//     setCart((prev) =>
-//       prev
-//         .map((i) =>
-//       i.id === id && i.size === size
-//             ? { ...i, quantity: i.quantity - 1 }
-//             : i
-//         )
-//         .filter((i) => i.quantity > 0)
-//     );
-//   };
 
 const decreaseQty = (id, size) => {
   setCart((prev) =>
@@ -86,7 +94,7 @@ const totalItems = useMemo(
 
 
   const subtotal = useMemo(
-    () => cart.reduce((s, i) => s + i.newPrice * i.quantity, 0),
+    () => cart.reduce((s, i) => s + i.price * i.quantity, 0),
     [cart]
   );
 

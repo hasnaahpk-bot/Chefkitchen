@@ -19,7 +19,9 @@ const OrderItem = ({ item }) => {
             <p className="text-sm font-medium text-white truncate">
               {item.title}
             </p>
-            <p className="text-xs text-green-400">$25.00</p>
+<p className="text-xs text-green-400">
+  {Number(item.price).toFixed(2)} AED
+</p>
           </div>
         </div>
 

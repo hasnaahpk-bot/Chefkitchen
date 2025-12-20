@@ -68,12 +68,12 @@
 //         </div>
 
 //         {/* ORDER TYPE */}
-//         <div className="mt-3 text-sm">
-//           <span className="text-gray-400">Order Type: </span>
-//           <span className="text-orange-400 font-medium">
-//             {orderType}
-//           </span>
-//         </div>
+        // <div className="mt-3 text-sm">
+        //   <span className="text-gray-400">Order Type: </span>
+        //   <span className="text-orange-400 font-medium">
+        //     {orderType}
+        //   </span>
+        // </div>
 
 //         <button
 //           onClick={onClose}
@@ -122,7 +122,12 @@ const Receipt = () => {
             </p>
           </div>
 
-          <button onClick={() => setShowReceipt(false)}>
+<button
+  onClick={() => {
+    clearCart();
+    setShowReceipt(false);
+  }}
+>
             <BiX size={22} className="text-orange-500" />
           </button>
         </div>
@@ -136,8 +141,9 @@ const Receipt = () => {
                   {it.title} ({it.size}) × {it.quantity}
                 </span>
                 <span>
-                  {(it.price * it.quantity).toFixed(2)}
-                </span>
+  {(Number(it.price) * Number(it.quantity)).toFixed(2)} AED
+</span>
+
               </div>
 
               {it.note?.trim() && (
@@ -163,6 +169,14 @@ const Receipt = () => {
             <span>Total</span>
             <span>{total.toFixed(2)} AED</span>
           </div>
+
+           {/* ORDER TYPE */}
+        {/* <div className="mt-3 text-sm">
+          <span className="text-gray-400">Order Type: </span>
+          <span className="text-orange-400 font-medium">
+            {orderType}
+          </span>
+        </div> */}
         </div>
 
         <button
