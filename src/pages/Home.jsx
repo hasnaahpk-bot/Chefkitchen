@@ -1,35 +1,145 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import  { useEffect, useMemo, useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import { BiCartAlt } from "react-icons/bi";
+import { BiCartAlt} from "react-icons/bi";
 
-import { DISHES, LABELS } from "../CONSTANTS";
-import { useCart, useUI } from "../context";
+import menu from "../assets/menu_img.svg";
+import menu2 from "../assets/menu_img2.svg";
+import menu3 from "../assets/menu_img3.svg";
+import menu5 from "../assets/menu_img5.svg";
+import menu6 from "../assets/menu_img6.svg";
 
 import DishCard from "./DishCard";
 import Sidebar from "./Sidebar";
 import OrdersPanel from "./OrdersPanel";
 import Receipt from "./Recipt";
 
+/* ---------------- dishes ---------------- */
+const dishes = [
+  {
+    id: "dish-1",
+    title: "Healthy noodle with spinach leaf",
+    oldPrice: 28,
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu,
+    category: "our", // today | south | our
+    type: "takeaway",
+  },
+  {
+    id: "dish-2",
+    title: "Spicy instant noodle with omelette",
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu2,
+    category: "today", // today | south | our
+    type: "dine-in",
+  },
+  {
+    id: "dish-3",
+    title: "Healthy noodle with spinach leaf",
+    oldPrice: 30,
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu3,
+    category: "today", // today | south | our
+    type: "dine-in",
+  },
+  {
+    id: "dish-4",
+    title: "Hot spicy fried rice",
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu5,
+    category: "today", // today | south | our
+    type: "takeaway",
+  },
+  {
+    id: "dish-5",
+    title: "Healthy noodle with spinach leaf",
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu,
+    category: "south", // today | south | our
+    type: "dine-in",
+  },
+  {
+    id: "dish-6",
+    title: "Spicy instant noodle",
+    oldPrice: 27,
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu6,
+    category: "our", // today | south | our
+    type: "takeaway",
+  },
+  {
+    id: "dish-7",
+    title: "Spicy instant noodle with omelette",
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu2,
+    category: "south", // today | south | our
+    type: "dine-in",
+  },
+  {
+    id: "dish-8",
+    title: "Healthy noodle with spinach leaf",
+    newPrice: 25,
+    sizes: ["S", "M", "L"],
+    img: menu3,
+    category: "our", // today | south | our
+    type: "takeaway",
+  },
+];
 
 const Home = () => {
-  // 🔹 CONTEXT
-  const { cart, addToCart, totalItems } = useCart();
-  const { isCartOpen, setIsCartOpen, showReceipt, setShowReceipt } = useUI();
-
-  // 🔹 PAGE-LOCAL STATE
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
   const [orderType, setOrderType] = useState("all");
   const [query, setQuery] = useState("");
-  const [active, setActive] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [now, setNow] = useState(new Date());
+  const [active, setActive] = useState(0);
 
-  // 🔹 CLOCK
+  const totalItems = cart.reduce((s, it) => s + it.quantity, 0);
+
+  const handleAddToCart = (item) => {
+    setCart((prev) => {
+      const key = `${item.id}-${item.size}`;
+      const exist = prev.find((p) => `${p.id}-${p.size}` === key);
+      if (exist) {
+        return prev.map((p) =>
+          `${p.id}-${p.size}` === key ? { ...p, quantity: p.quantity + 1 } : p
+        );
+      }
+      return [...prev, { ...item, quantity: 1, note: "" }];
+    });
+
+    setIsCartOpen(true);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 1500);
+  };
+
+  const handleRemove = (item) => {
+    setCart((prev) =>
+      prev.filter((p) => !(p.id === item.id && p.size === item.size))
+    );
+  };
+
+  const handleNoteChange = (item, note) => {
+    setCart((prev) =>
+      prev.map((p) =>
+        p.id === item.id && p.size === item.size ? { ...p, note } : p
+      )
+    );
+  };
+
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // 🔹 CATEGORY MAP
   const categoryMap = {
     0: "all",
     1: "today",
@@ -37,41 +147,47 @@ const Home = () => {
     3: "south",
   };
 
-  // 🔹 FILTERING (LOCAL LOGIC)
   const filteredDishes = useMemo(() => {
-    return DISHES.filter((dish) => {
+    return dishes.filter((dish) => {
       const matchQuery =
-        !query.trim() ||
-        dish.title.toLowerCase().includes(query.toLowerCase());
+        !query.trim() || dish.title.toLowerCase().includes(query.toLowerCase());
 
       const matchCategory =
         categoryMap[active] === "all"
           ? true
           : dish.category === categoryMap[active];
 
-      const matchType =
-        orderType === "all" ? true : dish.type === orderType;
-
+      const matchType = orderType === "all" ? true : dish.type === orderType;
       return matchQuery && matchCategory && matchType;
     });
   }, [query, active, orderType]);
 
-  // 🔹 ADD TO CART (CONTEXT SAFE)
-  const handleAdd = (dish) => {
-    addToCart(dish);
-    setIsCartOpen(true);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 1500);
+
+
+  const handleChange = (e) => {
+    setQuery(e.target.value);
   };
 
-const prevCartLength = useRef(cart.length);
 
-useEffect(() => {
-  if (cart.length > prevCartLength.current) {
-    setIsCartOpen(true);
-  }
-  prevCartLength.current = cart.length;
-}, [cart.length, setIsCartOpen]);
+  const handleIncrease = (item) => {
+  setCart((prev) =>
+    prev.map((p) =>
+      p.id === item.id && p.size === item.size
+        ? { ...p, quantity: p.quantity + 1 }
+        : p
+    )
+  );
+};
+
+const handleDecrease = (item) => {
+  setCart((prev) =>
+    prev.map((p) =>
+      p.id === item.id && p.size === item.size
+        ? { ...p, quantity: Math.max(1, p.quantity - 1) }
+        : p
+    )
+  );
+};
 
 
   return (
@@ -122,7 +238,7 @@ useEffect(() => {
 
                       <input
                         value={query}
-                         onChange={(e) => setQuery(e.target.value)}
+                        onChange={handleChange}
                         type="text"
                         placeholder="Search for food, coffee, etc..."
                         className="
@@ -226,12 +342,17 @@ useEffect(() => {
                 {filteredDishes.length === 0 ? (
                   <div className="fixed inset-0 flex items-center justify-center">
     <p className="text-gray-400 text-sm sm:text-base">
-      {LABELS.NO_MATCH}
+      No dishes match your selection
     </p>
   </div>
                 ) : (
                   filteredDishes.map((d) => (
-                    <DishCard key={d.id} dish={d} />
+                    <DishCard
+                      key={d.id}
+                      dish={d}
+                      onAdd={handleAddToCart}
+                      cart={cart}
+                    />
                   ))
                 )}
               </section>
@@ -240,7 +361,18 @@ useEffect(() => {
 
             <div className="hidden lg:block">
             {isCartOpen && (
-              <OrdersPanel />
+              <OrdersPanel
+                items={cart}
+                onRemove={handleRemove}
+                onNoteChange={handleNoteChange}
+                onIncrease={handleIncrease}
+                onDecrease={handleDecrease}
+                onClose={() => setIsCartOpen(false)}
+                onOrder={() => {
+                  setShowReceipt(true);
+                  setIsCartOpen(false);
+                }}
+              />
             )}
             </div>
           </div>
@@ -248,7 +380,12 @@ useEffect(() => {
       </div>
 
       {showReceipt && cart.length > 0 && (
-        <Receipt />
+        <Receipt
+          items={cart}
+          orderType={orderType}
+          onClose={() => setShowReceipt(false)}
+
+        />
       )}
 
      {/* MOBILE CART */}
@@ -270,8 +407,18 @@ useEffect(() => {
     `}
     onClick={(e) => e.stopPropagation()}
   >
-   <OrdersPanel />
-
+    <OrdersPanel
+      items={cart}
+      onRemove={handleRemove}
+      onNoteChange={handleNoteChange}
+      onIncrease={handleIncrease}
+      onDecrease={handleDecrease}
+      onClose={() => setIsCartOpen(false)}
+      onOrder={() => {
+        setShowReceipt(true);
+        setIsCartOpen(false);
+      }}
+    />
   </div>
 </div>
 
@@ -281,4 +428,3 @@ useEffect(() => {
 };
 
 export default Home;
-

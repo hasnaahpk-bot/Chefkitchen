@@ -1,8 +1,12 @@
 import Trash from "../assets/trash.svg";
-import { useCart } from "../context";
 
-const OrderItem = ({ item }) => {
-  const { removeFromCart, increaseQty, decreaseQty,  updateNote } = useCart();
+const OrderItem = ({
+  item,
+  onRemove,
+  onNoteChange,
+  onIncrease,
+  onDecrease,
+}) => {
   return (
     <div className="w-full space-y-2">
       {/* ROW */}
@@ -28,7 +32,7 @@ const OrderItem = ({ item }) => {
 
           <div className="flex items-center gap-1">
             <button
-              onClick={() => decreaseQty(item.id, item.size)}
+              onClick={() => onDecrease(item)}
               className="w-7 h-7 bg-[#2a2a3a] text-white rounded-md"
             >
               −
@@ -39,7 +43,7 @@ const OrderItem = ({ item }) => {
             </div>
 
             <button
-              onClick={() => increaseQty(item.id, item.size)}
+              onClick={() => onIncrease(item)}
               className="w-7 h-7 bg-[#2a2a3a] text-white rounded-md"
             >
               +
@@ -59,7 +63,7 @@ const OrderItem = ({ item }) => {
       <div className="flex items-center gap-2">
         <input
           value={item.note || ""}
-          onChange={(e) => updateNote(item.id, item.size, e.target.value)}
+          onChange={(e) => onNoteChange(item, e.target.value)}
           placeholder="Add note.."
           className="
             flex-1
@@ -75,7 +79,7 @@ const OrderItem = ({ item }) => {
         />
 
         <button
-          onClick={() => removeFromCart(item.id, item.size)}
+          onClick={() => onRemove(item)}
           className="w-9 h-9 border border-orange-500 rounded-md flex items-center justify-center"
         >
           <img src={Trash} alt="delete" className="w-4 h-4" />
