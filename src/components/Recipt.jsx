@@ -4,9 +4,8 @@ import { useCart, useUI } from "../context";
 
 const Receipt = () => {
   // 🔹 CONTEXT
-  const { clearCart } = useCart();
-  const { cart, subtotal } = useCart();
-  const { setShowReceipt } = useUI();
+  const { cart, subtotal, placeOrder } = useCart();
+  const { setShowReceipt, showReceipt } = useUI();
 
   // 🔹 DERIVED VALUES
   const discount = subtotal * 0.05;
@@ -15,7 +14,7 @@ const Receipt = () => {
   const orderTime = useMemo(() => new Date(), []);
 
   // 🔹 SAFETY: nothing to show
-  if (!cart.length) return null;
+if (!showReceipt) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
@@ -32,7 +31,7 @@ const Receipt = () => {
 
 <button
   onClick={() => {
-    clearCart();
+    placeOrder();
     setShowReceipt(false);
   }}
 >
@@ -89,7 +88,7 @@ const Receipt = () => {
 
         <button
           onClick={() => {
-  clearCart();
+  placeOrder();
   setShowReceipt(false);
 }}
 

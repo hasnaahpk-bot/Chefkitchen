@@ -88,7 +88,6 @@ const OrdersPanel = ({ className = "" }) => {
 
         <button
           onClick={() => {
-            placeOrder();
             setShowReceipt(true);
             setIsCartOpen(false);
           }}
