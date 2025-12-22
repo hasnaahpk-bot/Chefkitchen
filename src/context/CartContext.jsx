@@ -1,4 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
+import { DISHES } from "../CONSTANTS";
+
 
 const CartContext = createContext(null);
 
@@ -11,13 +13,21 @@ const addToCart = (dish) => {
       (i) => i.id === dish.id && i.size === dish.size
     );
 
+    const available =
+      stock?.[dish.id]?.[dish.size] ?? 0;
+
+    if (available <= 0) return prev; // ⛔ no stock
+
     if (existing) {
+      if (existing.quantity >= available) return prev; // ⛔ limit reached
+
       return prev.map((i) =>
         i.id === dish.id && i.size === dish.size
           ? { ...i, quantity: i.quantity + 1 }
           : i
       );
     }
+
 
     const price = Number(dish.prices?.[dish.size]);
 
@@ -49,15 +59,19 @@ const addToCart = (dish) => {
 };
 
 
-  const increaseQty = (id, size) => {
+const increaseQty = (id, size) => {
   setCart((prev) =>
-    prev.map((i) =>
-      i.id === id && i.size === size
-        ? { ...i, quantity: i.quantity + 1 }
-        : i
-    )
+    prev.map((i) => {
+      if (i.id === id && i.size === size) {
+        const available = stock?.[id]?.[size] ?? 0;
+        if (i.quantity >= available) return i; // ⛔ stop
+        return { ...i, quantity: i.quantity + 1 };
+      }
+      return i;
+    })
   );
 };
+
 
 const decreaseQty = (id, size) => {
   setCart((prev) =>
@@ -98,10 +112,38 @@ const totalItems = useMemo(
     [cart]
   );
 
+const [stock, setStock] = useState(() =>
+  Object.fromEntries(
+    DISHES.map(dish => [
+      dish.id,
+      { ...dish.bowls },
+    ])
+  )
+);
+
+const placeOrder = () => {
+  setStock((prev) => {
+    const next = structuredClone(prev);
+
+    cart.forEach((item) => {
+      if (next[item.id]?.[item.size] != null) {
+        next[item.id][item.size] -= item.quantity;
+      }
+    });
+
+    return next;
+  });
+
+  setCart([]);
+};
+
+
+
   return (
     <CartContext.Provider
       value={{
         cart,
+        stock,
         subtotal,
         totalItems,
         addToCart,
@@ -110,6 +152,7 @@ const totalItems = useMemo(
         decreaseQty,
         updateNote,
         clearCart,
+        placeOrder,
       }}
     >
       {children}
