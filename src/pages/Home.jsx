@@ -88,19 +88,18 @@ const Home = () => {
             </div>
 
             <main className="bg-slate-900 overflow-y-auto no-scrollbar tracking-wide">
-
-                  <Header
-    now={now}
-    query={query}
-    setQuery={setQuery}
-    setIsCartOpen={setIsCartOpen}
-    totalItems={totalItems}
-    active={active}
-    setActive={setActive}
-    orderType={orderType}
-    setOrderType={setOrderType}
-  />
-              <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-x-5 gap-y-12 py-12 px-4 sm:px-4 overflow-hidden">
+              <Header
+                now={now}
+                query={query}
+                setQuery={setQuery}
+                setIsCartOpen={setIsCartOpen}
+                totalItems={totalItems}
+                active={active}
+                setActive={setActive}
+                orderType={orderType}
+                setOrderType={setOrderType}
+              />
+              <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3  gap-x-5 gap-y-12 py-12 px-4 sm:px-4 overflow-hidden">
                 {filteredDishes.length === 0 ? (
                   <div className="fixed inset-0 flex items-center justify-center">
                     <p className="text-gray-400 text-sm sm:text-base">

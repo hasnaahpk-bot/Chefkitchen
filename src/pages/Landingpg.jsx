@@ -1,14 +1,16 @@
 import { useNavigate } from "react-router-dom";   
 import Salad from "../assets/salad.svg";
 import logo from "../assets/logo.svg";
+import { div } from "framer-motion/client";
 
 export default function Landingpg() {
 
   const navigate = useNavigate();   
 
   return (
+    <div className="bg-black">
     <div
-      className="h-screen bg-cover bg-center w-full flex items-center justify-center p-4 relative overflow-hidden"
+className="h-screen bg-cover bg-center max-w-[1600px] w-full mx-auto flex items-center justify-center p-4 relative overflow-hidden"
       style={{ backgroundImage: `url(${Salad})` }}
       id="Header"
     >
@@ -74,6 +76,7 @@ export default function Landingpg() {
         </div>
 
       </section>
+    </div>
     </div>
   );
 }

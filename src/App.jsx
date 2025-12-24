@@ -8,7 +8,7 @@ import Notify from "./components/Notify";
 
 // TODO : Create a sperate folder under the src named "CONSTANTS" and move all the constants to that folder  {{done}}
 // TODO : Remove unused imports and variable that will causes the performance issue {{done}}
-// TODO : Split this component into smaller components and move them , To make the code more clean
+// TODO : Split this component into smaller components and move them , To make the code more clean {{done}}
 // TODO : Need to sepreate the logic
 // TODO : Make the Empty dish text ["No dishes match your selection"] to the ceneter of the screen {{done}}
 // TODO : Use context here for the state management {{done}}
