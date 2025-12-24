@@ -1,5 +1,8 @@
 import { FaSearch } from "react-icons/fa";
 import { BiCartAlt } from "react-icons/bi";
+import { useCart, useUI } from "../context";
+import { useState } from "react";
+import ConfirmModal from "./ConfirmModal";
 
 const Header = ({
   now,
@@ -9,9 +12,19 @@ const Header = ({
   totalItems,
   active,
   setActive,
-  orderType,
-  setOrderType,
+  filterType,
+  setFilterType,
 }) => {
+  const { orderType, setOrderType } = useUI();
+
+  const { cart } = useCart();
+
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    nextOrderType: null,
+    nextFilterType: null,
+  });
+
   return (
     <header className="sticky top-0 z-30 bg-slate-900 pb-3">
       {/* TOP ROW */}
@@ -83,16 +96,12 @@ const Header = ({
             px-2 whitespace-nowrap
           "
         >
-          {[
-            "All",
-            "Today Special",
-            "Our Specials",
-            "South Indian Special",
-          ].map((label, i) => (
-            <button
-              key={label}
-              onClick={() => setActive(i)}
-              className={`
+          {["All", "Today Special", "Our Specials", "South Indian Special"].map(
+            (label, i) => (
+              <button
+                key={label}
+                onClick={() => setActive(i)}
+                className={`
                 relative pb-3 text-sm font-medium
                 transition-colors duration-300
                 ${
@@ -109,10 +118,11 @@ const Header = ({
                 ${active === i ? "after:scale-x-100" : "after:scale-x-0"}
                 after:origin-left
               `}
-            >
-              {label}
-            </button>
-          ))}
+              >
+                {label}
+              </button>
+            )
+          )}
         </div>
 
         {/* ORDER TYPE */}
@@ -120,16 +130,57 @@ const Header = ({
           <span className="text-lg">Choose Dishes</span>
 
           <select
-            value={orderType}
-            onChange={(e) => setOrderType(e.target.value)}
+            value={filterType}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              const nextOrderType =
+                value === "takeaway"
+                  ? "Takeaway"
+                  : value === "delivery"
+                  ? "Delivery"
+                  : "Dine In";
+
+              const skipConfirm =
+                localStorage.getItem("skipOrderTypeConfirm") === "true";
+
+              if (
+                cart.length > 0 &&
+                nextOrderType !== orderType &&
+                !skipConfirm
+              ) {
+                setConfirmState({
+                  open: true,
+                  nextOrderType,
+                  nextFilterType: value,
+                });
+                return;
+              }
+
+              setFilterType(value);
+              setOrderType(nextOrderType);
+            }}
             className="bg-slate-950 text-gray-300 border border-[#393C49] rounded px-2 py-1"
           >
             <option value="dine-in">Dine In</option>
             <option value="takeaway">Takeaway</option>
-            
+            <option value="delivery">Delivery</option>
           </select>
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirmState.open}
+        title="Change Order Type?"
+        message="You already have items in your cart. Changing the order type may affect how these items are processed."
+        showDontAskAgain
+        onCancel={() => setConfirmState({ open: false, nextOrderType: null })}
+        onConfirm={() => {
+          setFilterType(confirmState.nextFilterType);
+          setOrderType(confirmState.nextOrderType);
+          setConfirmState({ open: false, nextOrderType: null });
+        }}
+      />
     </header>
   );
 };

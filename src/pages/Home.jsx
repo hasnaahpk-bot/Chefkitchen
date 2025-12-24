@@ -13,10 +13,17 @@ import Header from "../components/Header";
 const Home = () => {
   // 🔹 CONTEXT
   const { cart, addToCart, totalItems } = useCart();
-  const { isCartOpen, setIsCartOpen, showReceipt, setShowReceipt } = useUI();
+  const {
+    isCartOpen,
+    setIsCartOpen,
+    showReceipt,
+    setShowReceipt,
+    orderType,
+    setOrderType,
+  } = useUI();
 
   // 🔹 PAGE-LOCAL STATE
-  const [orderType, setOrderType] = useState("all");
+  const [filterType, setFilterType] = useState("all");
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const [showToast, setShowToast] = useState(false);
@@ -47,11 +54,11 @@ const Home = () => {
           ? true
           : dish.category === categoryMap[active];
 
-      const matchType = orderType === "all" ? true : dish.type === orderType;
+      const matchType = filterType === "all" ? true : dish.type === filterType;
 
       return matchQuery && matchCategory && matchType;
     });
-  }, [query, active, orderType]);
+  }, [query, active, filterType]);
 
   // 🔹 ADD TO CART (CONTEXT SAFE)
   const handleAdd = (dish) => {
@@ -98,6 +105,8 @@ const Home = () => {
                 setActive={setActive}
                 orderType={orderType}
                 setOrderType={setOrderType}
+                filterType={filterType}
+                setFilterType={setFilterType}
               />
               <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3  gap-x-5 gap-y-12 py-12 px-4 sm:px-4 overflow-hidden">
                 {filteredDishes.length === 0 ? (
@@ -119,7 +128,7 @@ const Home = () => {
         </div>
       </div>
 
-      {showReceipt && cart.length > 0 && <Receipt />}
+      {showReceipt && <Receipt />}
 
       {/* MOBILE CART */}
       <div

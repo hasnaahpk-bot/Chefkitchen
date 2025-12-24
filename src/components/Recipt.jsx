@@ -4,17 +4,22 @@ import { useCart, useUI } from "../context";
 
 const Receipt = () => {
   // 🔹 CONTEXT
-  const { cart, subtotal, placeOrder } = useCart();
+  const { cart, placeOrder } = useCart();
   const { setShowReceipt, showReceipt } = useUI();
-
-  // 🔹 DERIVED VALUES
-  const discount = subtotal * 0.05;
-  const total = subtotal - discount;
 
   const orderTime = useMemo(() => new Date(), []);
 
   // 🔹 SAFETY: nothing to show
-if (!showReceipt) return null;
+  if (!showReceipt?.items?.length) return null;
+  const { items, orderType } = showReceipt;
+
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  // 🔹 DERIVED VALUES
+  const discount = subtotal * 0.05;
+  const total = subtotal - discount;
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
@@ -29,34 +34,31 @@ if (!showReceipt) return null;
             </p>
           </div>
 
-<button
-  onClick={() => {
-    placeOrder();
-    setShowReceipt(false);
-  }}
->
+          <button
+            onClick={() => {
+              // placeOrder();
+              setShowReceipt(false);
+            }}
+          >
             <BiX size={22} className="text-orange-500" />
           </button>
         </div>
 
         {/* ITEMS */}
         <div className="space-y-3 max-h-[45vh] overflow-auto">
-          {cart.map((it) => (
+          {items.map((it) => (
             <div key={`${it.id}-${it.size}`} className="text-sm space-y-1">
               <div className="flex justify-between">
                 <span>
                   {it.title} ({it.size}) × {it.quantity}
                 </span>
                 <span>
-  {(Number(it.price) * Number(it.quantity)).toFixed(2)} AED
-</span>
-
+                  {(Number(it.price) * Number(it.quantity)).toFixed(2)} AED
+                </span>
               </div>
 
               {it.note?.trim() && (
-                <p className="text-xs text-gray-400 pl-1">
-                  Note: {it.note}
-                </p>
+                <p className="text-xs text-gray-400 pl-1">Note: {it.note}</p>
               )}
             </div>
           ))}
@@ -77,21 +79,19 @@ if (!showReceipt) return null;
             <span>{total.toFixed(2)} AED</span>
           </div>
 
-           {/* ORDER TYPE */}
-        {/* <div className="mt-3 text-sm">
-          <span className="text-gray-400">Order Type: </span>
-          <span className="text-orange-400 font-medium">
-            {orderType}
-          </span>
-        </div> */}
+          {/* ORDER TYPE */}
+          {/* ORDER TYPE */}
+          <div className="mt-3 text-sm flex justify-between">
+            <span className="text-gray-400">Order Type</span>
+            <span className="text-orange-400 font-medium">{orderType}</span>
+          </div>
         </div>
 
         <button
           onClick={() => {
-  placeOrder();
-  setShowReceipt(false);
-}}
-
+            // placeOrder();
+            setShowReceipt(false);
+          }}
           className="mt-4 w-full bg-orange-500 py-2.5 rounded-lg font-semibold"
         >
           Close

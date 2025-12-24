@@ -2,11 +2,26 @@ import { BiX } from "react-icons/bi";
 import { useState } from "react";
 import OrderItem from "./OrderItem";
 import { useCart, useUI } from "../context";
+import { ORDER_TYPES } from "../CONSTANTS";
 
 const OrdersPanel = ({ className = "" }) => {
   const { cart, subtotal, placeOrder } = useCart();
   const { setIsCartOpen, setShowReceipt } = useUI();
-  const [activeType, setActiveType] = useState("Dine In");
+  const { activeOrderPanelType, setActiveOrderPanelType } = useUI();
+
+  const activeType = activeOrderPanelType;
+
+  const filteredCart =
+    activeType === "All"
+      ? cart
+      : cart.filter((item) => item.orderType === activeType);
+
+  const filteredSubtotal = filteredCart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  const Type = Object.values(ORDER_TYPES);
 
   return (
     <aside
@@ -30,16 +45,14 @@ const OrdersPanel = ({ className = "" }) => {
         <BiX size={18} className="text-orange-500" />
       </button>
 
-      <h3 className="text-lg font-semibold text-white mb-3">
-        Orders
-      </h3>
+      <h3 className="text-lg font-semibold text-white mb-3">Orders</h3>
 
       {/* ORDER TYPE */}
       <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto">
-        {["Dine In", "Take away", "Delivery"].map((type) => (
+        {Type.map((type) => (
           <button
             key={type}
-            onClick={() => setActiveType(type)}
+            onClick={() => setActiveOrderPanelType(type)}
             className={`
               text-xs px-3 py-2 rounded-md border whitespace-nowrap transition
               ${
@@ -63,13 +76,16 @@ const OrdersPanel = ({ className = "" }) => {
 
       {/* ITEMS */}
       <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-4">
-        {cart.length === 0 ? (
+        {filteredCart.length === 0 ? (
           <p className="text-sm text-gray-400 text-center mt-10">
-            No items yet
+            No items for {activeType}
           </p>
         ) : (
-          cart.map((item) => (
-            <OrderItem key={item.id} item={item} />
+          filteredCart.map((item) => (
+            <OrderItem
+              key={`${item.id}-${item.size}-${item.orderType}`}
+              item={item}
+            />
           ))
         )}
       </div>
@@ -83,24 +99,31 @@ const OrdersPanel = ({ className = "" }) => {
 
         <div className="flex justify-between mt-1 text-sm text-white">
           <span>Subtotal</span>
-          <span>{subtotal.toFixed(2)} AED</span>
+          <span>{filteredSubtotal.toFixed(2)} AED</span>
         </div>
 
         <button
           onClick={() => {
-            setShowReceipt(true);
+            const orderItems = [...filteredCart]; // 🔒 snapshot
+
+            setShowReceipt({
+              items: orderItems,
+              orderType: activeType,
+            });
+
+            placeOrder(orderItems, activeType);
             setIsCartOpen(false);
           }}
-          disabled={!cart.length}
+          disabled={filteredCart.length === 0 || activeType === "All"}
           className="
-            w-full mt-4 py-3 rounded-lg
-            bg-orange-500 text-white font-semibold
-            shadow-[0_0_28px_rgba(249,115,22,0.6)]
-            disabled:bg-gray-600 disabled:shadow-none
-            transition
-          "
+    w-full mt-4 py-3 rounded-lg
+    bg-orange-500 text-white font-semibold
+    shadow-[0_0_28px_rgba(249,115,22,0.6)]
+    disabled:bg-gray-600 disabled:shadow-none
+    transition
+  "
         >
-          Order now
+          Order {activeType}
         </button>
       </div>
     </aside>

@@ -1,40 +1,37 @@
 import { useState, useMemo } from "react";
-import { useCart } from "../context";
+import { useCart, useUI } from "../context";
 
 const DishCard = ({ dish }) => {
   const { cart, addToCart, stock } = useCart();
+  const { orderType } = useUI();
   const [selectedSize, setSelectedSize] = useState(null);
 
   const effectiveSize =
     selectedSize ?? (dish.sizes?.length ? dish.sizes[0] : null);
 
   const effectivePrice = dish.prices?.[effectiveSize];
-const effectiveBowls =
-  stock?.[dish.id]?.[effectiveSize] ?? 0;
+  const effectiveBowls = stock?.[dish.id]?.[effectiveSize] ?? 0;
 
-const isOutOfStock = effectiveBowls <= 0;
-
+  const isOutOfStock = effectiveBowls <= 0;
 
   const isAdded = useMemo(
     () =>
-      cart.some(
-        (item) =>
-          item.id === dish.id && item.size === effectiveSize
-      ),
+      cart.some((item) => item.id === dish.id && item.size === effectiveSize),
     [cart, dish.id, effectiveSize]
   );
 
-
-
   const handleAdd = () => {
-    addToCart({
-      id: dish.id ?? dish.title,
-      title: dish.title,
-      img: dish.img,
-      prices: dish.prices,
-      size: effectiveSize,
-      bowls: effectiveBowls,
-    });
+    addToCart(
+      {
+        id: dish.id ?? dish.title,
+        title: dish.title,
+        img: dish.img,
+        prices: dish.prices,
+        size: effectiveSize,
+        bowls: effectiveBowls,
+      },
+      orderType
+    );
 
     if (!selectedSize && effectiveSize) {
       setSelectedSize(effectiveSize);
@@ -80,8 +77,7 @@ const isOutOfStock = effectiveBowls <= 0;
       <div className="mt-3 flex gap-2 flex-wrap justify-center">
         {dish.sizes?.map((size) => {
           const active =
-            size === selectedSize ||
-            (!selectedSize && size === dish.sizes[0]);
+            size === selectedSize || (!selectedSize && size === dish.sizes[0]);
 
           return (
             <button
@@ -101,22 +97,19 @@ const isOutOfStock = effectiveBowls <= 0;
 
       {/* ADD BUTTON */}
       <div className="mt-3 sm:mt-4 w-full flex justify-center">
-        
-
         <button
-  onClick={handleAdd}
-  disabled={isAdded || isOutOfStock}
-  className={`px-4 py-1.5 text-xs sm:text-sm rounded-md font-semibold transition w-full sm:w-auto ${
-    isAdded
-      ? "bg-green-500 text-black cursor-default"
-      : isOutOfStock
-      ? "bg-[#141823] text-red-600 font-semibold cursor-not-allowed"
-      : "bg-[#141823] text-orange-400 hover:bg-[#1a1f2e]"
-  }`}
->
-  {isAdded ? "Added" : isOutOfStock ? "Sold Out" : "Add"}
-</button>
-
+          onClick={handleAdd}
+          disabled={isAdded || isOutOfStock}
+          className={`px-4 py-1.5 text-xs sm:text-sm rounded-md font-semibold transition w-full sm:w-auto ${
+            isAdded
+              ? "bg-green-500 text-black cursor-default"
+              : isOutOfStock
+              ? "bg-[#141823] text-red-600 font-semibold"
+              : "bg-[#141823] text-orange-400 hover:bg-[#1a1f2e]"
+          }`}
+        >
+          {isAdded ? "Added" : isOutOfStock ? "Sold Out" : "Add"}
+        </button>
       </div>
     </article>
   );

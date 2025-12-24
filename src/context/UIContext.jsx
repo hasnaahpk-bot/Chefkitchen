@@ -5,8 +5,9 @@ const UIContext = createContext(null);
 export function UIProvider({ children }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
+  const [orderType, setOrderType] = useState("Dine In");
+  const [activeOrderPanelType, setActiveOrderPanelType] = useState("Dine In");
 
-  
   return (
     <UIContext.Provider
       value={{
@@ -14,6 +15,10 @@ export function UIProvider({ children }) {
         setIsCartOpen,
         showReceipt,
         setShowReceipt,
+        orderType,
+        setOrderType,
+        activeOrderPanelType: orderType,
+        setActiveOrderPanelType: setOrderType,
       }}
     >
       {children}
