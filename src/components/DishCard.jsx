@@ -1,10 +1,16 @@
 import { useState, useMemo } from "react";
 import { useCart, useUI } from "../context";
+import { useWishlist } from "../context/WishlistContext";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+
 
 const DishCard = ({ dish }) => {
   const { cart, addToCart, stock } = useCart();
   const { orderType } = useUI();
   const [selectedSize, setSelectedSize] = useState(null);
+  const { toggleWishlist, isWishlisted } = useWishlist();
+  const fav = isWishlisted(dish.id);
+
 
   const effectiveSize =
     selectedSize ?? (dish.sizes?.length ? dish.sizes[0] : null);
@@ -110,6 +116,34 @@ const DishCard = ({ dish }) => {
         >
           {isAdded ? "Added" : isOutOfStock ? "Sold Out" : "Add"}
         </button>
+
+
+<button
+  onClick={() =>
+    toggleWishlist({
+      id: dish.id,
+      title: dish.title,
+      img: dish.img,
+      prices: dish.prices,
+      sizes: dish.sizes,
+    })
+  }
+  className="
+    absolute
+    right-3
+    z-10
+    text-lg sm:text-xl
+    top-20 sm:top-3
+  "
+>
+  {fav ? (
+    <AiFillHeart className="text-red-600" />
+  ) : (
+    <AiOutlineHeart className="text-gray-400 hover:text-red-400" />
+  )}
+</button>
+
+
       </div>
     </article>
   );

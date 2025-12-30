@@ -1,8 +1,8 @@
 import Landingpg from "./pages/Landingpg";
 import Home from "./pages/Home";
 import { Route, Routes } from "react-router-dom";
-import Offer from "./components/Offer";
-import Wishlist from "./components/Wishlist";
+import Offer from "./pages/Offer";
+import Wishlist from "./pages/Wishlist";
 import Mail from "./components/Mail";
 import Notify from "./components/Notify";
 
