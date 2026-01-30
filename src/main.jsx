@@ -6,17 +6,25 @@ import { BrowserRouter } from 'react-router-dom'
 import { UIProvider } from './context/UIContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { WishlistProvider } from './context/WishlistContext.jsx'
+import { ProductsProvider } from './context/ProductsContext.jsx'
+import { CategoriesProvider } from './context/CategoriesContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <UIProvider>
-      <CartProvider>
+    
+      
+        <ProductsProvider>
+        <CategoriesProvider>
+          <CartProvider>
+            <UIProvider>
         <WishlistProvider>
     <BrowserRouter>
     <App />
     </BrowserRouter>
     </WishlistProvider>
-    </CartProvider>
     </UIProvider>
+    </CartProvider>
+     </CategoriesProvider>
+    </ProductsProvider>
   </StrictMode>,
 )

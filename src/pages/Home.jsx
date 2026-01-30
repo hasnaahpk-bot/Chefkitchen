@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { BiCartAlt } from "react-icons/bi";
 
-import { DISHES, LABELS } from "../CONSTANTS";
+import { LABELS } from "../CONSTANTS"; // keep labels only
 import { useCart, useUI } from "../context";
+import { useProducts } from "../context/ProductsContext";
+
 import Sidebar from "../components/Sidebar";
 import DishCard from "../components/DishCard";
 import OrdersPanel from "../components/OrdersPanel";
@@ -11,8 +13,11 @@ import Receipt from "../components/Recipt";
 import Header from "../components/Header";
 
 const Home = () => {
+
   // 🔹 CONTEXT
   const { cart, addToCart, totalItems } = useCart();
+  const { items } = useProducts(); // ✅ REAL DASHBOARD DISHES
+
   const {
     isCartOpen,
     setIsCartOpen,
@@ -22,7 +27,7 @@ const Home = () => {
     setOrderType,
   } = useUI();
 
-  // 🔹 PAGE-LOCAL STATE
+  // 🔹 PAGE STATE
   const [filterType, setFilterType] = useState("all");
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -35,7 +40,7 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // 🔹 CATEGORY MAP
+  // 🔹 CATEGORY MAP (same as before)
   const categoryMap = {
     0: "all",
     1: "today",
@@ -43,30 +48,31 @@ const Home = () => {
     3: "south",
   };
 
-  // 🔹 FILTERING (LOCAL LOGIC)
+  // 🔹 FILTER REAL DASHBOARD DISHES
+
   const filteredDishes = useMemo(() => {
-    return DISHES.filter((dish) => {
+    return items.filter((dish) => {
+
       const matchQuery =
-        !query.trim() || dish.title.toLowerCase().includes(query.toLowerCase());
+        !query.trim() ||
+        dish.title.toLowerCase().includes(query.toLowerCase());
 
       const matchCategory =
         categoryMap[active] === "all"
           ? true
           : dish.category === categoryMap[active];
 
-      const matchType = filterType === "all" ? true : dish.type === filterType;
+      // if you don't use type anymore, keep this safe:
+      const matchType =
+        filterType === "all" || !dish.type
+          ? true
+          : dish.type === filterType;
 
       return matchQuery && matchCategory && matchType;
     });
-  }, [query, active, filterType]);
+  }, [items, query, active, filterType]);
 
-  // 🔹 ADD TO CART (CONTEXT SAFE)
-  const handleAdd = (dish) => {
-    addToCart(dish);
-    setIsCartOpen(true);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 1500);
-  };
+  // 🔹 CART OPEN AUTO
 
   const prevCartLength = useRef(cart.length);
 
@@ -90,11 +96,13 @@ const Home = () => {
       <div className="min-h-screen bg-black w-full flex justify-center">
         <div className="h-screen bg-slate-900 text-gray-200 max-w-[1600px] w-full overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-[70px_1fr_auto] gap-2 h-full">
+
             <div className="hidden lg:block">
               <Sidebar />
             </div>
 
             <main className="bg-slate-900 overflow-y-auto no-scrollbar tracking-wide">
+
               <Header
                 now={now}
                 query={query}
@@ -108,22 +116,32 @@ const Home = () => {
                 filterType={filterType}
                 setFilterType={setFilterType}
               />
-              <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3  gap-x-5 gap-y-12 py-12 px-4 sm:px-4 overflow-hidden">
+
+              <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-x-5 gap-y-12 py-12 px-4 overflow-hidden">
+
                 {filteredDishes.length === 0 ? (
+
                   <div className="fixed inset-0 flex items-center justify-center">
                     <p className="text-gray-400 text-sm sm:text-base">
                       {LABELS.NO_MATCH}
                     </p>
                   </div>
+
                 ) : (
-                  filteredDishes.map((d) => <DishCard key={d.id} dish={d} />)
+
+                  filteredDishes.map(dish => (
+                    <DishCard key={dish.id} dish={dish} />
+                  ))
+
                 )}
+
               </section>
             </main>
 
             <div className="hidden lg:block">
               {isCartOpen && <OrdersPanel />}
             </div>
+
           </div>
         </div>
       </div>
@@ -133,20 +151,20 @@ const Home = () => {
       {/* MOBILE CART */}
       <div
         className={`
-    fixed inset-0 z-[999] lg:hidden
-    bg-black/50
-    transition-opacity duration-300
-    ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
-  `}
+          fixed inset-0 z-[999] lg:hidden
+          bg-black/50
+          transition-opacity duration-300
+          ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
+        `}
         onClick={() => setIsCartOpen(false)}
       >
         <div
           className={`
-      absolute top-0 right-0 h-full
-      w-[85%] max-w-[380px]
-      transition-transform duration-300 ease-out
-      ${isCartOpen ? "translate-x-0" : "translate-x-full"}
-    `}
+            absolute top-0 right-0 h-full
+            w-[85%] max-w-[380px]
+            transition-transform duration-300
+            ${isCartOpen ? "translate-x-0" : "translate-x-full"}
+          `}
           onClick={(e) => e.stopPropagation()}
         >
           <OrdersPanel />

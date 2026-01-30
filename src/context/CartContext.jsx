@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { DISHES } from "../CONSTANTS";
+import { useProducts } from "./ProductsContext";
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  // const [cart, setCart] = useState([]);
+
+  const { items } = useProducts();
 
   const [cart, setCart] = useState(() => {
     try {
@@ -19,37 +20,43 @@ export function CartProvider({ children }) {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  const clearCart = () => {
-    setCart([]);
-    localStorage.removeItem("cart");
-  };
+  const [stock, setStock] = useState({});
+
+  useEffect(() => {
+    const map = {};
+    items.forEach(d => {
+      map[d.id] = { ...d.bowls };
+    });
+    setStock(map);
+  }, [items]);
 
   const addToCart = (dish, orderType) => {
-    setCart((prev) => {
+
+    setCart(prev => {
+
       const existing = prev.find(
-        (i) => i.id === dish.id && i.size === dish.size
+        i => i.id === dish.id && i.size === dish.size
       );
 
-      const available = stock?.[dish.id]?.[dish.size] ?? 0;
+      const available =
+        stock?.[dish.id]?.[dish.size] ??
+        dish.bowls?.[dish.size] ??
+        0;
 
-      if (available <= 0) return prev; // ⛔ no stock
+      if (available <= 0) return prev;
 
       if (existing) {
-        if (existing.quantity >= available) return prev; // ⛔ limit reached
 
-        return prev.map((i) =>
+        if (existing.quantity >= available) return prev;
+
+        return prev.map(i =>
           i.id === dish.id && i.size === dish.size
             ? { ...i, quantity: i.quantity + 1 }
             : i
         );
       }
 
-      const price = Number(dish.prices?.[dish.size]);
-
-      if (Number.isNaN(price)) {
-        console.error("Invalid price for dish:", dish);
-        return prev; // hard stop — prevents corrupt cart
-      }
+      const price = Number(dish.prices[dish.size]);
 
       return [
         ...prev,
@@ -59,62 +66,47 @@ export function CartProvider({ children }) {
           img: dish.img,
           size: dish.size,
           quantity: 1,
-          price, // ✅ CRITICAL LINE
+          price,
           note: "",
-          orderType,
-        },
+          orderType
+        }
       ];
     });
   };
 
-  const removeFromCart = (id, size) => {
-    setCart((prev) => prev.filter((i) => !(i.id === id && i.size === size)));
-  };
+  const removeFromCart = (id, size) =>
+    setCart(p => p.filter(i => !(i.id === id && i.size === size)));
 
-  const increaseQty = (id, size) => {
-    setCart((prev) =>
-      prev.map((i) => {
+  const increaseQty = (id, size) =>
+    setCart(p =>
+      p.map(i => {
         if (i.id === id && i.size === size) {
           const available = stock?.[id]?.[size] ?? 0;
-          if (i.quantity >= available) return i; // ⛔ stop
+          if (i.quantity >= available) return i;
           return { ...i, quantity: i.quantity + 1 };
         }
         return i;
       })
     );
-  };
 
-  const decreaseQty = (id, size) => {
-    setCart((prev) =>
-      prev.map((i) => {
-        if (i.id === id && i.size === size) {
-          return i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i; // ⛔ do nothing if quantity is 1
-        }
-        return i;
-      })
+  const decreaseQty = (id, size) =>
+    setCart(p =>
+      p.map(i =>
+        i.id === id && i.size === size && i.quantity > 1
+          ? { ...i, quantity: i.quantity - 1 }
+          : i
+      )
     );
-  };
 
-  const updateNote = (id, size, note) => {
-    setCart((prev) =>
-      prev.map((i) => (i.id === id && i.size === size ? { ...i, note } : i))
-    );
-  };
+  const clearCart = () => setCart([]);
 
-  const totalItems = useMemo(
-    () => cart.reduce((sum, item) => sum + item.quantity, 0),
-    [cart]
-  );
+  const placeOrder = (itemsToOrder, orderType) => {
 
-  const [stock, setStock] = useState(() =>
-    Object.fromEntries(DISHES.map((dish) => [dish.id, { ...dish.bowls }]))
-  );
+    setStock(prev => {
 
-  const placeOrder = (items, orderType) => {
-    setStock((prev) => {
       const next = structuredClone(prev);
 
-      items.forEach((item) => {
+      itemsToOrder.forEach(item => {
         if (next[item.id]?.[item.size] != null) {
           next[item.id][item.size] -= item.quantity;
         }
@@ -123,35 +115,33 @@ export function CartProvider({ children }) {
       return next;
     });
 
-    // remove only ordered items
-    setCart((prev) => prev.filter((item) => item.orderType !== orderType));
+    setCart(prev => prev.filter(i => i.orderType !== orderType));
   };
 
+  const totalItems = useMemo(
+    () => cart.reduce((s, i) => s + i.quantity, 0),
+    [cart]
+  );
+
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        stock,
-        // subtotal,
-        totalItems,
-        addToCart,
-        removeFromCart,
-        increaseQty,
-        decreaseQty,
-        updateNote,
-        clearCart,
-        placeOrder,
-      }}
-    >
+    <CartContext.Provider value={{
+      cart,
+      stock,
+      totalItems,
+      addToCart,
+      removeFromCart,
+      increaseQty,
+      decreaseQty,
+      clearCart,
+      placeOrder
+    }}>
       {children}
     </CartContext.Provider>
   );
 }
 
-export function useCart() {
+export const useCart = () => {
   const ctx = useContext(CartContext);
-  if (!ctx) {
-    throw new Error("useCart must be used inside CartProvider");
-  }
+  if (!ctx) throw new Error("useCart must be inside CartProvider");
   return ctx;
-}
+};

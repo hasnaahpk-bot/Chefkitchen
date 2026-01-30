@@ -7,3 +7,9 @@ export const ORDER_TYPES = {
   TAKEAWAY: "Takeaway",
   DELIVERY: "Delivery",
 };
+
+export const CATEGORIES = [
+{ name: "our Special", active: true },
+{ name: "Today Special", active: true },
+{ name: "south indian Special", active: true }
+];

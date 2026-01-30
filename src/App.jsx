@@ -5,6 +5,11 @@ import Offer from "./pages/Offer";
 import Wishlist from "./pages/Wishlist";
 import Mail from "./components/Mail";
 import Notify from "./components/Notify";
+import Dashboard from "./DASHBOARD/Dashboard";
+import Category from "./DASHBOARD/Category";
+import Products from "./DASHBOARD/Products";
+import OrdersPanel from "./components/OrdersPanel";
+import Orders from "./DASHBOARD/Orders";
 
 // TODO : Create a sperate folder under the src named "CONSTANTS" and move all the constants to that folder  {{done}}
 // TODO : Remove unused imports and variable that will causes the performance issue {{done}}
@@ -27,6 +32,11 @@ const App = () => {
         <Route path="/like" element={<Wishlist />} />
         <Route path="/mail" element={<Mail />} />
         <Route path="/notify" element={<Notify />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+        <Route path="category" element={<Category />} />
+        <Route path="products" element={<Products />} />
+        <Route path="orders" element={<Orders />} />
+      </Route>      
       </Routes>
     </div>
   );
