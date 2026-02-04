@@ -66,7 +66,7 @@ export default function Landingpg() {
             </p>
 
             <button
-              onClick={() => navigate("/home")}
+              onClick={() => navigate("/login")}
               className="mt-5 w-full rounded-xl font-medium shadow-lg"
               style={{
                 background: "linear-gradient(180deg,#ff8a3d 0%, #ffb86c 100%)",
@@ -75,7 +75,7 @@ export default function Landingpg() {
                 boxShadow: "0 8px 24px rgba(255,140,60,0.18)",
               }}
             >
-              Explore Menu
+              Login
             </button>
           </div>
         </section>

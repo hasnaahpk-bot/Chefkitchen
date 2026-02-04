@@ -8,11 +8,12 @@ import { CartProvider } from './context/CartContext.jsx'
 import { WishlistProvider } from './context/WishlistContext.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
 import { CategoriesProvider } from './context/CategoriesContext.jsx'
+import { OrdersProvider } from './context/OrdersContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     
-      
+      <OrdersProvider>
         <ProductsProvider>
         <CategoriesProvider>
           <CartProvider>
@@ -26,5 +27,6 @@ createRoot(document.getElementById('root')).render(
     </CartProvider>
      </CategoriesProvider>
     </ProductsProvider>
+    </OrdersProvider>
   </StrictMode>,
 )

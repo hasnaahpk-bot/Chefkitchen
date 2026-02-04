@@ -6,9 +6,6 @@ export default function ProductList() {
 
   const {
     paginatedItems,
-    page,
-    setPage,
-    totalPages,
     addDish,
     updateDish,
     deleteDish
@@ -33,7 +30,7 @@ export default function ProductList() {
     delivery:false
   });
 
-  // ---------- RESET ----------
+  // ================= RESET =================
 
   const resetForm = () => {
     setTitle("");
@@ -46,7 +43,7 @@ export default function ProductList() {
     setEditId(null);
   };
 
-  // ---------- IMAGE ----------
+  // ================= IMAGE =================
 
   const handleImageUpload = file => {
     if (!file) return;
@@ -55,7 +52,7 @@ export default function ProductList() {
     reader.readAsDataURL(file);
   };
 
-  // ---------- SAVE ----------
+  // ================= SAVE =================
 
   const handleSaveDish = () => {
 
@@ -94,14 +91,13 @@ export default function ProductList() {
       orderTypes: selectedOrderTypes
     };
 
-    if (editId) updateDish(dish);
-    else addDish(dish);
+    editId ? updateDish(dish) : addDish(dish);
 
     resetForm();
     setOpen(false);
   };
 
-  // ---------- EDIT ----------
+  // ================= EDIT =================
 
   const handleEdit = dish => {
 
@@ -135,10 +131,10 @@ export default function ProductList() {
     setOpen(true);
   };
 
-  // ---------- UI ----------
+  // ================= UI =================
 
   return (
-    <div className="px-6 py-4 bg-gray-200 min-h-full">
+    <div className="px-3 sm:px-6 py-4 bg-gray-200 min-h-full">
 
       <div className="flex justify-between mb-6">
         <h1 className="text-lg font-semibold">Products</h1>
@@ -151,7 +147,9 @@ export default function ProductList() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {/* ================= DESKTOP TABLE ================= */}
+
+      <div className="hidden md:block bg-white rounded-lg shadow overflow-x-auto">
 
         <table className="w-full text-sm">
 
@@ -180,7 +178,11 @@ export default function ProductList() {
 
             {paginatedItems.map(dish => (
 
-              <tr key={dish.id} className="border-t hover:bg-gray-50">
+              <tr key={dish.id} className={`hover:bg-gray-50 ${
+    dish.sizes.every(s => dish.bowls[s] <= 0)
+      ? "bg-red-50"
+      : ""
+  }`}>
 
                 <td className="px-4 py-3">
                   <img
@@ -189,25 +191,46 @@ export default function ProductList() {
                   />
                 </td>
 
-                <td className="px-4 py-3 font-medium">
-                  {dish.title}
-                </td>
-
-                <td className="px-4 py-3">
-                  {dish.category}
-                </td>
+                <td className="px-4 py-3 font-medium">{dish.title}</td>
+                <td className="px-4 py-3">{dish.category}</td>
 
                 <td className="px-4 py-3 space-y-1">
-                  {dish.sizes.map(s => (
+                  {/* {dish.sizes.map(s => (
                     <div key={s} className="text-xs">
                       {s}: <b>{dish.bowls[s]}</b>
                     </div>
-                  ))}
+                  ))} */}
+
+                  {dish.sizes.map(s => {
+
+  const qty = dish.bowls[s];
+
+  return (
+    <div key={s} className="text-xs flex items-center gap-2">
+
+      <span>{s}:</span>
+
+      {qty > 0 ? (
+
+        <span className="font-semibold">
+          {qty}
+        </span>
+
+      ) : (
+
+        <span className="px-2 py-[2px] rounded-full text-[10px] bg-red-100 text-red-600 font-semibold">
+          Out of Stock
+        </span>
+
+      )}
+
+    </div>
+  );
+})}
+
                 </td>
 
-                <td className="px-4 py-3">
-                  {dish.sizes.join(", ")}
-                </td>
+                <td className="px-4 py-3">{dish.sizes.join(", ")}</td>
 
                 <td className="px-4 py-3 space-y-1">
                   {dish.sizes.map(s => (
@@ -218,26 +241,25 @@ export default function ProductList() {
                 </td>
 
                 <td className="px-4 py-3 text-xs">
-                  {dish.orderTypes?.join(", ") || "-"}
+                  {dish.orderTypes?.join(", ")}
                 </td>
 
                 <td className="px-4 py-3 flex gap-2">
-
                   <button
                     onClick={() => handleEdit(dish)}
-                    className="text-blue-600 text-xs hover:underline"
+                    className="text-blue-600 text-xs"
                   >
                     Edit
                   </button>
 
                   <button
                     onClick={() => deleteDish(dish.id)}
-                    className="text-red-600 text-xs hover:underline"
+                    className="text-red-600 text-xs"
                   >
                     Delete
                   </button>
-
                 </td>
+
               </tr>
             ))}
 
@@ -245,12 +267,86 @@ export default function ProductList() {
         </table>
       </div>
 
+      {/* ================= MOBILE CARDS (IMPROVED) ================= */}
+
+      <div className="md:hidden space-y-5">
+
+        {paginatedItems.map(dish => (
+
+          <div
+            key={dish.id}
+            className="bg-white rounded-xl shadow-md overflow-hidden"
+          >
+
+            <div className="h-40 w-full">
+              <img
+                src={dish.img}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-4">
+
+              <div className="mb-3">
+                <h3 className="font-semibold text-base">
+                  {dish.title}
+                </h3>
+
+                <p className="text-xs text-gray-500">
+                  {dish.category}
+                </p>
+
+                <p className="text-xs text-gray-400 mt-1">
+                  {dish.orderTypes?.join(", ")}
+                </p>
+              </div>
+
+              <div className="space-y-2 mb-4 text-sm">
+
+                {dish.sizes.map(s => (
+                  <div
+                    key={s}
+                    className="flex justify-between bg-gray-100 rounded px-3 py-1.5"
+                  >
+                    <span className="font-medium">{s}</span>
+
+                    <span>
+                      ₹{dish.prices[s]} • Stock {dish.bowls[s]}
+                    </span>
+                  </div>
+                ))}
+
+              </div>
+
+              <div className="flex justify-end gap-4 text-sm">
+
+                <button
+                  onClick={() => handleEdit(dish)}
+                  className="text-blue-600 font-medium"
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => deleteDish(dish.id)}
+                  className="text-red-600 font-medium"
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* ================= MODAL ================= */}
 
       {open && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center p-3">
 
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
 
             <h2 className="text-lg font-semibold mb-4">
               {editId ? "Edit Dish" : "Add Dish"}
@@ -275,7 +371,7 @@ export default function ProductList() {
               {img && (
                 <img
                   src={img}
-                  className="w-24 h-24 rounded mt-2"
+                  className="w-24 h-24 rounded"
                 />
               )}
 
@@ -286,44 +382,33 @@ export default function ProductList() {
               >
                 <option value="">Select Category</option>
 
-                {categories
-                  .filter(cat => cat.active)
-                  .map(cat => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
-                    </option>
-                  ))}
+                {categories.filter(c => c.active).map(c => (
+                  <option key={c.id} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
               </select>
 
-              <div>
-                <p className="text-sm font-medium mb-1">Order Type</p>
+              <div className="flex gap-4 text-sm">
 
-                <div className="flex gap-4 text-sm">
+                {["dinein","takeaway","delivery"].map(type => (
+                  <label key={type} className="flex items-center gap-1">
 
-                  {["dinein","takeaway","delivery"].map(type => (
-                    <label key={type} className="flex items-center gap-1">
-
-                      <input
-                        type="checkbox"
-                        checked={orderTypes[type]}
-                        onChange={() =>
-                          setOrderTypes(p => ({
-                            ...p,
-                            [type]: !p[type]
-                          }))
-                        }
-                      />
-
-                      {type === "dinein"
-                        ? "Dine In"
-                        : type === "takeaway"
-                        ? "Takeaway"
-                        : "Delivery"
+                    <input
+                      type="checkbox"
+                      checked={orderTypes[type]}
+                      onChange={() =>
+                        setOrderTypes(p => ({ ...p, [type]: !p[type] }))
                       }
-                    </label>
-                  ))}
+                    />
 
-                </div>
+                    {type === "dinein"
+                      ? "Dine In"
+                      : type === "takeaway"
+                      ? "Takeaway"
+                      : "Delivery"}
+                  </label>
+                ))}
               </div>
 
               {["S","M","L"].map(size => (
@@ -347,7 +432,7 @@ export default function ProductList() {
                     onChange={e =>
                       setPrices(p => ({ ...p, [size]: e.target.value }))
                     }
-                    className="border px-2 py-1 w-28 rounded"
+                    className="border px-2 py-1 w-24 rounded"
                   />
 
                   <input
@@ -358,7 +443,7 @@ export default function ProductList() {
                     onChange={e =>
                       setStocks(p => ({ ...p, [size]: e.target.value }))
                     }
-                    className="border px-2 py-1 w-28 rounded"
+                    className="border px-2 py-1 w-24 rounded"
                   />
                 </div>
               ))}

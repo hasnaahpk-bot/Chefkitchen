@@ -10,6 +10,7 @@ import Category from "./DASHBOARD/Category";
 import Products from "./DASHBOARD/Products";
 import OrdersPanel from "./components/OrdersPanel";
 import Orders from "./DASHBOARD/Orders";
+import Login from "./components/Login";
 
 // TODO : Create a sperate folder under the src named "CONSTANTS" and move all the constants to that folder  {{done}}
 // TODO : Remove unused imports and variable that will causes the performance issue {{done}}
@@ -27,6 +28,7 @@ const App = () => {
     <div>
       <Routes>
         <Route path="/" element={<Landingpg />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/offer" element={<Offer />} />
         <Route path="/like" element={<Wishlist />} />

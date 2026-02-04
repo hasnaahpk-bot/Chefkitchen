@@ -5,6 +5,8 @@ import { BiCartAlt } from "react-icons/bi";
 import { LABELS } from "../CONSTANTS"; // keep labels only
 import { useCart, useUI } from "../context";
 import { useProducts } from "../context/ProductsContext";
+import { useCategories } from "../context/CategoriesContext";
+
 
 import Sidebar from "../components/Sidebar";
 import DishCard from "../components/DishCard";
@@ -17,7 +19,9 @@ const Home = () => {
   // 🔹 CONTEXT
   const { cart, addToCart, totalItems } = useCart();
   const { items } = useProducts(); // ✅ REAL DASHBOARD DISHES
+const { categories } = useCategories();
 
+  
   const {
     isCartOpen,
     setIsCartOpen,
@@ -30,9 +34,11 @@ const Home = () => {
   // 🔹 PAGE STATE
   const [filterType, setFilterType] = useState("all");
   const [query, setQuery] = useState("");
-  const [active, setActive] = useState(0);
+  // const [active, setActive] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [now, setNow] = useState(new Date());
+const [activeCategory, setActiveCategory] = useState("all");
+
 
   // 🔹 CLOCK
   useEffect(() => {
@@ -41,36 +47,35 @@ const Home = () => {
   }, []);
 
   // 🔹 CATEGORY MAP (same as before)
-  const categoryMap = {
-    0: "all",
-    1: "today",
-    2: "our",
-    3: "south",
-  };
+  // const categoryMap = {
+  //   0: "all",
+  //   1: "today",
+  //   2: "our",
+  //   3: "south",
+  // };
 
   // 🔹 FILTER REAL DASHBOARD DISHES
 
   const filteredDishes = useMemo(() => {
-    return items.filter((dish) => {
+  return items.filter(dish => {
 
-      const matchQuery =
-        !query.trim() ||
-        dish.title.toLowerCase().includes(query.toLowerCase());
+    const matchQuery =
+      !query.trim() ||
+      dish.title.toLowerCase().includes(query.toLowerCase());
 
-      const matchCategory =
-        categoryMap[active] === "all"
-          ? true
-          : dish.category === categoryMap[active];
+    const matchCategory =
+      activeCategory === "all"
+        ? true
+        : dish.category === activeCategory;
 
-      // if you don't use type anymore, keep this safe:
-      const matchType =
-        filterType === "all" || !dish.type
-          ? true
-          : dish.type === filterType;
+    const matchType =
+      filterType === "all" || !dish.type
+        ? true
+        : dish.type === filterType;
 
-      return matchQuery && matchCategory && matchType;
-    });
-  }, [items, query, active, filterType]);
+    return matchQuery && matchCategory && matchType;
+  });
+}, [items, query, activeCategory, filterType]);
 
   // 🔹 CART OPEN AUTO
 
@@ -82,6 +87,20 @@ const Home = () => {
     }
     prevCartLength.current = cart.length;
   }, [cart.length, setIsCartOpen]);
+
+
+  const activeCategories = useMemo(() => {
+  return categories.filter(c => c.active);
+}, [categories]);
+
+const categoryTabs = [
+  { id: "all", name: "All" },
+  ...activeCategories.map(c => ({
+    id: c.name,
+    name: c.name
+  }))
+];
+
 
   return (
     <>
@@ -109,8 +128,9 @@ const Home = () => {
                 setQuery={setQuery}
                 setIsCartOpen={setIsCartOpen}
                 totalItems={totalItems}
-                active={active}
-                setActive={setActive}
+                activeCategory={activeCategory}
+  setActiveCategory={setActiveCategory}
+  categories={categories}
                 orderType={orderType}
                 setOrderType={setOrderType}
                 filterType={filterType}
